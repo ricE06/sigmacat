@@ -98,24 +98,20 @@ class Five(commands.Cog):
         # Gets the card corresponding to the index in the list of possible
         # cards and sets it to the maximum number of characters needed
         def get_card(player, index):
-            card = str(numbers[player][index])
-            while len(card) < len(str(CARD_POOL)):
-                card = "0" + card
-            return card
+            card = numbers[player][index]
+            emoji_list = [":one:",":two:",":three:",":four:",":five:",":six:",":seven:",":eight:",":nine:",":keycap_ten:"]
+            return emoji_list[card-1]
 
         # Displays the grid for each player (takes in player ID)
         async def display(players):
             for player in players:
                 user = await self.client.fetch_user(player)
-                string = user.name + "'s board \n`"
+                string = user.name + "'s board \n"
                 for i in range(GRID_SIZE):
                     for j in range(GRID_SIZE):
                         string = string + get_card(player, GRID_SIZE*i+j)
-                        if j < (GRID_SIZE - 1):
-                            string = string + "|"
                     if i < (GRID_SIZE - 1):
-                        string = string + "`\n`"
-                string = string + "`"
+                        string = string + "\n"
                 await message.channel.send(string)
 
         # Fills in the possible cards in the cards list, adding four of
