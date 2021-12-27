@@ -219,7 +219,7 @@ class Five(commands.Cog):
                             message = int(m.content)
                         except ValueError:
                             return False
-                        return m.author.id in waiting
+                        return m.author.id in waiting and m.channel == channel
                     # Asks for x and y positions
                     await channel.send("What column do you want this card in?")
                     while len(waitingx) > 0:
