@@ -99,14 +99,14 @@ class Five(commands.Cog):
         # cards and sets it to the maximum number of characters needed
         def get_card(player, index):
             card = int(numbers[player][index])
-            emoji_list = [":one:",":two:",":three:",":four:",":five:",":six:",":seven:",":eight:",":nine:",":keycap_ten:",":black_large_square:"]
+            emoji_list = [":one:",":two:",":three:",":four:",":five:",":six:",":seven:",":eight:",":nine:",":keycap_ten:",":blue_medium_square:"]
             return emoji_list[card-1]
 
         # Displays the grid for each player (takes in player ID)
         async def display(players):
             for player in players:
                 user = await self.client.fetch_user(player)
-                string = user.name + "'s board \n"
+                string = user.name + "'s board \n Current score: " + str(calc_grid(numbers[player], message.channel)) + "\n"
                 for i in range(GRID_SIZE):
                     for j in range(GRID_SIZE):
                         string = string + get_card(player, GRID_SIZE*i+j)
