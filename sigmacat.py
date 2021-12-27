@@ -21,6 +21,7 @@ The labeling for the grid is **0-4** rows, **0-4** columns. \n\
 To end the game at any time, simply input -1 when asked for row/column number. \
 "
 
+token = open("token.txt", "r").read()
 client = commands.Bot(command_prefix = "$")
 
 async def load(ctx, extension):
@@ -48,6 +49,6 @@ for filename in os.listdir("./cogs"):
 
 keep_alive.keep_alive()
 
-client.run('token')
+client.run(token)
 
 
