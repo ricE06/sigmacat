@@ -98,8 +98,8 @@ class Five(commands.Cog):
         # Gets the card corresponding to the index in the list of possible
         # cards and sets it to the maximum number of characters needed
         def get_card(player, index):
-            card = numbers[player][index]
-            emoji_list = [":one:",":two:",":three:",":four:",":five:",":six:",":seven:",":eight:",":nine:",":keycap_ten:"]
+            card = int(numbers[player][index])
+            emoji_list = [":one:",":two:",":three:",":four:",":five:",":six:",":seven:",":eight:",":nine:",":keycap_ten:",":black_large_square:"]
             return emoji_list[card-1]
 
         # Displays the grid for each player (takes in player ID)
