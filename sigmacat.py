@@ -20,7 +20,6 @@ The goal is to get the largest point value. \
 The labeling for the grid is **0-4** rows, **0-4** columns. \n\
 To end the game at any time, simply input -1 when asked for row/column number. \
 "
-
 token = open("token.txt", "r").read()
 client = commands.Bot(command_prefix = "$")
 
