@@ -48,6 +48,6 @@ for filename in os.listdir("./cogs"):
 
 keep_alive.keep_alive()
 
-client.run('OTIyNTg2NzM0MDU3ODg5Nzky.YcDn2g.Jj_88I5RcLpTuKCpNhd8l8ueFmA')
+client.run('token')
 
 
