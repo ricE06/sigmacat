@@ -37,6 +37,13 @@ async def ligma(ctx: commands.Context):
 async def howto(ctx:commands.Context):
     await ctx.send(instructions)
 
+@client.command(name="reload")
+async def reload(ctx:commands.Context):
+    if filename.endswith(".py"):
+        client.unload_extension(f"cogs.{filename[:-3]}")
+        client.load_extension(f"cogs.{filename[:-3]}")
+        print(f"cogs.{filename[:-3]}")    
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))

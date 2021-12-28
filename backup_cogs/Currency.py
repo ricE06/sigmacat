@@ -20,7 +20,7 @@ class Currency(commands.Cog):
         user_id = ctx.message.author.id
         await ctx.send("You currently have " + str(Currency.get_current(self, user_id)) + " O-bucks.")
 
-    # Adds 1000 to a user if they have not used this command within the last 24
+    # Adds 500 to a user if they have not used this command within the last 24
     @commands.command(name="daily")
     async def give_daily(self, ctx:commands.Context):
         user_id = ctx.message.author.id
@@ -80,15 +80,6 @@ class Currency(commands.Cog):
             Currency.update_balance(self, user_id, balance)
         else:
             Currency.add_row(self, user_id, balance)
-
-    # Changes the user's balance by an amount (can be negative)
-    def change(self, user_id, change):
-        balance = Currency.get_current(self, user_id)
-        new_balance = balance + change
-        # Cannot dip below zero
-        if new_balance < 0:
-            new_balance = 0
-        Currency.update(self, user_id, new_balance)
 
     # Returns a list of all users in the table
     def get_users(self):

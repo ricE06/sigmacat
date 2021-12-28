@@ -4,8 +4,6 @@ from discord.ext import commands, tasks
 import datetime
 import time
 import random
-from . import Currency
-from Currency import Currency
 con = sqlite3.connect('reaper.db')
 cur = con.cursor()
 
@@ -26,12 +24,12 @@ class Reaper(commands.Cog):
             user_id = message.author.id
             game_id = Reaper.convert(self, message.guild.id)
             reap_cost = int(Reaper.get_user(self, user_id, game_id)[5])
-            user_balance = Currency.get_current(self, user_id)
+            user_balance = Currency.get_current(user_id)
             current_time = int(time.time())
-            # Checks if enough time has passed to reap again
+            # Checks if enough time has passed to reap again (only if monetize is off)
             time_since_reap = current_time - int(Reaper.get_user(self, user_id, game_id)[2])
             time_until_reap = 3600 - time_since_reap
-            if time_since_reap < 3600: 
+            if time_since_reap < 3600 and Reaper.get_single_metadata(self, game_id)[5] == 0:
                 await message.channel.send("You must wait " + str(datetime.timedelta(seconds=time_until_reap)) + " until your next reap.")
             # Checks if the user has enough O-bucks to reap
             elif user_balance < reap_cost:
@@ -43,9 +41,11 @@ class Reaper(commands.Cog):
                 points = round(raw_score * multi)
                 # Adds the points to the user's score
                 new_total = int(Reaper.get_score(self, user_id, game_id)) + points
+                # Spends the O-bucks
+                Currency.change(user_id, -reap_cost)
                 # Checks if this wins the game
                 if new_total >= int(Reaper.get_max_score(self, game_id)):
-                    await Reaper.end_game(self, message, game_id)
+                    await Reaper.end(self, message, game_id)
                 else:
                     # Adds the points to the player
                     Reaper.update(self, user_id, game_id, new_total, current_time)
@@ -101,6 +101,13 @@ class Reaper(commands.Cog):
                          + str(full[i][1]) + "`"
             await message.channel.send(string)
 
+        # Cost
+        if valid and (message.content == "cost"):
+            user_id = message.author.id
+            game_id = Reaper.convert(self, message.guild.id)
+            cost = str(Reaper.get_user(self, user_id, game_id)[5])
+            await message.channel.send("Your current reap cost is " + cost + " O-bucks.")
+
 
     # Begins a new reaper game!
     @commands.command()
@@ -122,14 +129,14 @@ class Reaper(commands.Cog):
         cur.execute("DROP TABLE " + str(game_id))
         cur.execute("DELETE FROM metadata WHERE server=?", (game_id,))
         con.commit()
-        
+
+    # End game command    
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def end_game(self, ctx:commands.Context):
         game_id = Reaper.convert(self, ctx.message.guild.id)
         message = ctx.message
         await Reaper.end(self, message, game_id)
-
 
     # Gets the current score of a user
     def get_score(self, user_id, game_id):
@@ -255,4 +262,7 @@ class Reaper(commands.Cog):
 
 def setup(client):
     client.add_cog(Reaper(client))
+    print("Initialized")
+    global Currency
+    Currency = client.get_cog("Currency")
 
