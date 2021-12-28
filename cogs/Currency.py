@@ -5,7 +5,7 @@ from datetime import date
 con = sqlite3.connect('currencies.db')
 cur = con.cursor()
 
-DAILY_AMOUNT = 500
+DAILY_AMOUNT = 1000
 
 
 # noinspection PyUnresolvedReferences
@@ -33,7 +33,7 @@ class Currency(commands.Cog):
             Currency.update(self, user_id, new)
             cur.execute("UPDATE balances SET lastDaily=? WHERE user=?", (str(current_date), user_id))
             con.commit()
-            await ctx.send("Successfully deposited 500 O-bucks!")
+            await ctx.send("Successfully deposited 1000 O-bucks!")
 
     # Makes a table
     def create(self):
