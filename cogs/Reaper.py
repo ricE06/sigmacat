@@ -170,8 +170,8 @@ class Reaper(commands.Cog):
                     nat_multi += 0.5
                 else:
                     break
-        add_multi = Reaper.get_user(self, user_id, game_id)[3]
-        multi_multi = Reaper.get_user(self, user_id, game_id)[4]
+        add_multi = int(Reaper.get_user(self, user_id, game_id)[3])
+        multi_multi = int(Reaper.get_user(self, user_id, game_id)[4])
         multi = round(float((nat_multi + add_multi)*multi_multi), 1)
         return multi
 
