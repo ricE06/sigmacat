@@ -186,10 +186,18 @@ class Five(commands.Cog):
 
             
         # Jatloe's bad function that runs to ask for columns
-        async def ask_column(waitingx,positions, channel, checkidk):
+        
+        async def ask_column(waitingx,positions,channel,waiting):
+            def check(m):
+                try:
+                    message = int(m.content)
+                except ValueError:
+                    return False
+                return m.author.id in waiting and m.channel == channel
+            
             await channel.send("What column do you want this card in?")
             while len(waitingx) > 0:
-                msg = await self.client.wait_for("message", checkidk)
+                msg = await self.client.wait_for("message", check=check)
                 xpos = int(msg.content)
                 positions[msg.author.id][0] = xpos
                 if xpos >= -1 and xpos < GRID_SIZE:
@@ -238,12 +246,12 @@ class Five(commands.Cog):
                             return False
                         return m.author.id in waiting and m.channel == channel
                     # Asks for x and y positions
-                    await ask_column(waitingx,positions, channel, check=check)
+                    await ask_column(waitingx,positions, channel,waiting)
                     while len(waitingy) > 0:
                         msg = await self.client.wait_for("message", check=check)
                         if msg.content == "cancel":
                             waitingx.append(msg.author.id)
-                            ask_column(waitingx,positions, channel, check=check)
+                            ask_column(waitingx,positions, channel,waiting)
                         ypos = int(msg.content)
                         positions[msg.author.id][1] = ypos
                         if ypos >= -1 and ypos < GRID_SIZE:
