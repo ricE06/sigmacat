@@ -184,6 +184,23 @@ class Five(commands.Cog):
                 string = string + "\n" + user.name + ": " + str(scores[player])
             await message.channel.send(string)
 
+            
+        # Jatloe's bad function that runs to ask for columns
+        async def ask_column(waitingx,positions, channel):
+            await channel.send("What column do you want this card in?")
+            while len(waitingx) > 0:
+                msg = await self.client.wait_for("message", check=check)
+                xpos = int(msg.content)
+                positions[msg.author.id][0] = xpos
+                if xpos >= -1 and xpos < GRID_SIZE:
+                    waitingx.remove(msg.author.id)
+                    if xpos == -1:
+                       await channel.send("Game ended.")
+                       return 3
+                elif xpos < -1 or xpos >= GRID_SIZE:
+                    await channel.send("<@" + str(msg.author.id) + ">, out of range!")
+            return positions
+        
         # Gives the player a card, asks for the position to place it, and
         # displays the grid with the new card until the grid is filled
         async def main_loop(players):
@@ -221,21 +238,12 @@ class Five(commands.Cog):
                             return False
                         return m.author.id in waiting and m.channel == channel
                     # Asks for x and y positions
-                    await channel.send("What column do you want this card in?")
-                    while len(waitingx) > 0:
-                        msg = await self.client.wait_for("message", check=check)
-                        xpos = int(msg.content)
-                        positions[msg.author.id][0] = xpos
-                        if xpos >= -1 and xpos < GRID_SIZE:
-                            waitingx.remove(msg.author.id)
-                            if xpos == -1:
-                                await channel.send("Game ended.")
-                                return 3
-                        elif xpos < -1 or xpos >= GRID_SIZE:
-                            await channel.send("Out of range!")
-                    await channel.send("What row do you want this card in?")
+                    await ask_column(waitingx,positions, channel)
                     while len(waitingy) > 0:
                         msg = await self.client.wait_for("message", check=check)
+                        if msg.content == "cancel":
+                            waitingx.append(msg.author.id)
+                            ask_column(waitingx,positions, channel)
                         ypos = int(msg.content)
                         positions[msg.author.id][1] = ypos
                         if ypos >= -1 and ypos < GRID_SIZE:
@@ -244,7 +252,7 @@ class Five(commands.Cog):
                                 await channel.send("Game ended.")
                                 return 3
                         elif ypos < -1 or ypos >= GRID_SIZE:
-                            await channel.send("Out of range!")
+                            await channel.send("<@" + str(msg.author.id) + ">, out of range!")
                     # Adds the card to the grid, checks if vacant
                     num_waiting = len(waiting)
                     passed = []
