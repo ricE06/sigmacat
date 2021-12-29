@@ -123,8 +123,8 @@ class Reaper(commands.Cog):
 
         # Pool
         if valid and (message.content == "pool"):
+            game_id = Reaper.convert(self, message.guild.id)
             if Reaper.get_single_metadata(self, game_id)[5] == 1:
-                game_id = Reaper.convert(self, message.guild.id)
                 pool = str(Reaper.get_user(self, 0, game_id)[5])
                 await message.channel.send("There are currently " + pool + " O-bucks up for grabs.")
             else:
