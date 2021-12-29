@@ -5,9 +5,14 @@ import os
 import keep_alive
 
 instructions = "To play **Reaper** (\"reap\"):\n\
-Reap by typing reap. The amount of points you can get from a single reap \
+Reap by typing `reap`. The amount of points you can get from a single reap \
 is the exact number of seconds since the previous person reaped. The winner \
-is the first to a set amount of points. \n\
+is the first to a set amount of points. \
+Other commands can be found in the channel description.\n\
+Some reaper games can be *monetized*, meaning that you must pay a certain number \
+of O-bucks to reap in them. The O-bucks remain in a prize pool until the game \
+*is played to completion*, when they will be distributed among the players \
+based on their scores and a couple other additional factors (such as ranking).\n\
 To play **Five-by-Five** ($five):\n\
 25 cards will be drawn from 40 cards (face cards removed). Aces are \
 worth one and all others are worth their numerical values. After each card is \
