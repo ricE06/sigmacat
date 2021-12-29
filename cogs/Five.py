@@ -28,7 +28,7 @@ class Five(commands.Cog):
         game["cards"] = [] 
         game["players"] = []
 
-        await ctx.send("Game starting. Please `join`, `start`, or begin a quick `small` game.")
+        await ctx.send("Game starting. Please `$fjoin`, `$fstart`, or begin a quick `small` game.")
 
         self.games[str(ctx.channel.id)] = game
 
@@ -214,17 +214,30 @@ the labeling is 0-4 rows, 0-4 columns.")
         return score
 
     def calc_player_adj(self, group):
-        cur = -1 
-        streak = 1 
+        streak = 1
         score = 0
-
-        for i in group:
-            if i != cur:
-                score += streak * cur if streak > 1 else 0
-                cur = i 
-            else:
+        for i in range(len(group)-1):
+            if group[i+1] == group[i]:
                 streak += 1
-        score += streak * cur if streak > 1 else 0
+            else:
+                if streak >= 2:
+                    score += streak*int(group[i])
+                streak = 1
+        if streak >= 2:
+            score += streak*int(group[len(group)-1])
+        return score
+        # floofys un-functional code
+        # cur = -1 
+        # streak = 1 
+        # score = 0
+
+        # for i in group:
+        #     if i != cur:
+        #         score += streak * cur if streak > 1 else 0
+        #         cur = i 
+        #     else:
+        #         streak += 1
+        # score += streak * cur if streak > 1 else 0
 
         return score
 

@@ -23,7 +23,8 @@ For example, [4, 4, 5, 7, 1] gives 8 points and [7, 9, 9, 9, 2] gives 27 points.
 Rows or columns without any adjacent lines give no points. \
 The goal is to get the largest point value. \
 The labeling for the grid is **0-4** rows, **0-4** columns. \n\
-To end the game at any time, simply input -1 when asked for row/column number. \
+To place a card, use `$fplace [row number] [column number]`. \n\
+To end the game at any time, simply type `$fend`. \
 "
 token = open("token.txt", "r").read()
 client = commands.Bot(command_prefix = "$")
