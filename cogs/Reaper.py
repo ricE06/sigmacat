@@ -45,6 +45,7 @@ class Reaper(commands.Cog):
                 Currency.change(user_id, -reap_cost)
                 # Checks if this wins the game
                 if new_total >= int(Reaper.get_max_score(self, game_id)):
+                    Reaper.reward(self, game_id, message.channel)
                     await Reaper.end(self, message, game_id)
                 else:
                     # Adds the points to the player and the total
@@ -160,31 +161,50 @@ class Reaper(commands.Cog):
     async def end_game(self, ctx:commands.Context):
         game_id = Reaper.convert(self, ctx.message.guild.id)
         message = ctx.message
-        Reaper.reward(self, game_id)
         await Reaper.end(self, message, game_id)
 
 
     # Distributes O-bucks at the end of a game
-    def reward(self, game_id):
-        pool = Reaper.get_user(self, 0, game_id)[5]
-        total_score = Reaper.get_user(self, 0, game_id)[1]
+    async def reward(self, game_id, channel):
         # Gets the top ten, in descending order
         cur.execute("SELECT user, score FROM " + game_id + " ORDER BY score DESC")
         winners = cur.fetchmany(11)
         del winners[0]
-        for i in range(len(winners)):
-            if i < 3:
-                multi = 1.5
-            elif i >= 3 and i < 5:
-                multi = 1.2
-            elif i>= 6 and i < 10:
-                multi = 1 
+        if Reaper.get_single_metadata(self, game_id)[5] == 1 and \
+        Reaper.get_single_metadata(self, game_id)[2] >= 50000 and \
+        len(winners) == 10:
+            pool = Reaper.get_user(self, 0, game_id)[5]
+            total_score = Reaper.get_user(self, 0, game_id)[1]
+            string = "O-bucks awarded: "
+            for i in range(len(winners)):
+                if i < 3:
+                    multi = 1.5
+                elif i >= 3 and i < 5:
+                    multi = 1.2
+                elif i>= 5 and i < 10:
+                    multi = 1 
+                else:
+                    multi = 0
+                user_id = winners[i][0]
+                score = int(winners[i][1])
+                amount_won = round(multi * pool * (score / total_score))
+                Currency.change(user_id, amount_won)
+                try:
+                    user = await self.client.fetch_user(user_id)
+                    name = user.display_name
+                except:
+                    name = "[user not found]"
+                string = string + "\n" + str(name) + ": `" \
+                         + str(amount_won) + "`"
+            await channel.send(string)
+        else:
+            if len(winners) < 10:
+                await channel.send("There are not enough people playing to award O-bucks.")
+            elif Reaper.get_single_metadata(self, game_id)[2] < 50000:
+                await channel.send("The max score must be at least 50k to award O-bucks.")
             else:
-                multi = 0
-            user_id = winners[i][0]
-            score = int(winners[i][1])
-            amount_won = multi * pool * (score / total_score)
-            Currency.change(user_id, amount_won)
+                await channel.send("No O-bucks were awarded because the game was not monetized.")
+
 
 
     # Gets the current score of a user
