@@ -43,26 +43,27 @@ class Reaper(commands.Cog):
                 new_total = int(Reaper.get_score(self, user_id, game_id)) + points
                 # Spends the O-bucks
                 Currency.change(user_id, -reap_cost)
+                # Adds the points to the player and the total
+                new_cost = round(reap_cost * 1.05)
+                Reaper.update(self, user_id, game_id, new_total, current_time, new_cost)
+                previous_total = int(Reaper.get_user(self, 0, game_id)[1])
+                # Logs the time of the reap, replaces the global last reap time
+                pool = int(Reaper.get_user(self, 0, game_id)[5])
+                new_pool = pool + reap_cost
+                Reaper.update(self, 0, game_id, previous_total + points, current_time, new_pool)
+                # Sends reponse message
+                if multi > 1:
+                    # Shortens integer mulipliers to one digit long
+                    multi = int(multi) if multi.is_integer() else multi
+                    text = "Your reap earned " + str(points)\
+                            + " points. You also got a " + str(multi) + "x reap!"
+                else:
+                    text = "Your reap earned " + str(points) + " points."
+                await message.channel.send(text)
                 # Checks if this wins the game
                 if new_total >= int(Reaper.get_max_score(self, game_id)):
+                    await Reaper.reward(self, game_id, message.channel)
                     await Reaper.end(self, message, game_id)
-                else:
-                    # Adds the points to the player
-                    new_cost = round(reap_cost * 1.05)
-                    Reaper.update(self, user_id, game_id, new_total, current_time, new_cost)
-                    # Logs the time of the reap, replaces the global last reap time
-                    pool = int(Reaper.get_user(self, 0, game_id)[5])
-                    new_pool = pool + reap_cost
-                    Reaper.update(self, 0, game_id, 0, current_time, new_pool)
-                    # Sends reponse message
-                    if multi > 1:
-                        # Shortens integer mulipliers to one digit long
-                        multi = int(multi) if multi.is_integer() else multi
-                        text = "Your reap earned " + str(points)\
-                                + " points. You also got a " + str(multi) + "x reap!"
-                    else:
-                        text = "Your reap earned " + str(points) + " points."
-                    await message.channel.send(text)
 
         # Rank
         if valid and (message.content == "rank"):
@@ -97,18 +98,19 @@ class Reaper(commands.Cog):
             game_id = Reaper.convert(self, message.guild.id)
             # Gets all the scores, in descending order
             cur.execute("SELECT user, score FROM " + game_id + " ORDER BY score DESC")
-            full = cur.fetchall()
+            winners = cur.fetchmany(11)
+            del winners[0]
             # The thing the bot actually displays
             string = "\n"
-            for i in range(min(len(full), 10)):
-                id = int(full[i][0])
+            for i in range(len(winners)):
+                id = int(winners[i][0])
                 try:
                     user = await self.client.fetch_user(id)
                     name = user.display_name
                 except:
                     name = "[user not found]"
                 string = string + "\n" + str(name) + ": `" \
-                         + str(full[i][1]) + "`"
+                         + str(winners[i][1]) + "`"
             await message.channel.send(string)
 
         # Cost
@@ -159,6 +161,52 @@ class Reaper(commands.Cog):
         game_id = Reaper.convert(self, ctx.message.guild.id)
         message = ctx.message
         await Reaper.end(self, message, game_id)
+
+
+    # Distributes O-bucks at the end of a game
+    async def reward(self, game_id, channel):
+        # Gets the top ten, in descending order
+        cur.execute("SELECT user, score FROM " + game_id + " ORDER BY score DESC")
+        winners = cur.fetchmany(11)
+        max_score = int(Reaper.get_single_metadata(self, game_id)[2])
+        del winners[0]
+        if Reaper.get_single_metadata(self, game_id)[5] == 1 and \
+        max_score >= 50000 and len(winners) == 10:
+            pool = Reaper.get_user(self, 0, game_id)[5]
+            total_score = Reaper.get_user(self, 0, game_id)[1]
+            string = "O-bucks awarded: "
+            for i in range(len(winners)):
+                if i < 3:
+                    multi = 1.5
+                elif i >= 3 and i < 5:
+                    multi = 1.2
+                elif i>= 5 and i < 10:
+                    multi = 1 
+                else:
+                    multi = 0
+                user_id = winners[i][0]
+                score = int(winners[i][1])
+                amount_won = round(multi * pool * (score / total_score))
+                if i==0 and score > max_score:
+                    amount_won += round((score - max_score)/5)
+                Currency.change(user_id, amount_won)
+                try:
+                    user = await self.client.fetch_user(user_id)
+                    name = user.display_name
+                except:
+                    name = "[user not found]"
+                string = string + "\n" + str(name) + ": `" \
+                         + str(amount_won) + "`"
+            await channel.send(string)
+        else:
+            if len(winners) < 10:
+                await channel.send("There are not enough people playing to award O-bucks.")
+            elif Reaper.get_single_metadata(self, game_id)[2] < 50000:
+                await channel.send("The max score must be at least 50k to award O-bucks.")
+            else:
+                await channel.send("No O-bucks were awarded because the game was not monetized.")
+
+
 
     # Gets the current score of a user
     def get_score(self, user_id, game_id):

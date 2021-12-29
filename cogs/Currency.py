@@ -84,7 +84,7 @@ class Currency(commands.Cog):
     # Changes the user's balance by an amount (can be negative)
     def change(self, user_id, change):
         balance = Currency.get_current(self, user_id)
-        new_balance = balance + change
+        new_balance = round(balance + change)
         # Cannot dip below zero
         if new_balance < 0:
             new_balance = 0
