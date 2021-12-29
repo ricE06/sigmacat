@@ -10,7 +10,7 @@ class Five(commands.Cog):
     @commands.command()
     async def five(self, ctx):
         if str(ctx.channel.id) in self.games:
-            await ctx.send("u suck")
+            await ctx.send("There is already an active game here!")
             return 
 
         game = {}
@@ -37,35 +37,39 @@ class Five(commands.Cog):
         lId = str(ctx.channel.id)
 
         if lId not in self.games:
-            await ctx.send("No game has begun yet dummy")
+            await ctx.send("There is no active game in this channel. \
+You can use `$five` to start one!")
             return 
 
 
         if ctx.author.id in self.games[lId]["players"]:
-            await ctx.send("You've already joined, idiot")
+            await ctx.send("You've already joined the game!")
             return  
 
         if self.games[lId]["IN_PROGRESS"]:
-            await ctx.send("game is in progress u dumb")
+            await ctx.send("There is already a game in progress in this channel. \
+You can start another one in a different channel or wait for this one to finish.")
             return
 
         self.games[lId]["players"].append(ctx.author.id)
-        await ctx.send("You've successfully joined")
+        await ctx.send("<@" + str(ctx.author.id) + "> has successfully joined!")
 
     @commands.command()
     async def fstart(self, ctx):
         lId = str(ctx.channel.id)
 
         if lId not in self.games:
-            await ctx.send("u dumb")
+            await ctx.send("There is no game to start. You can create one \
+using `$five`.")
             return 
 
         if len(self.games[lId]["players"]) < 1:
-            await ctx.send("ur mega dumb")
+            await ctx.send("There must be at least one player to play! You \
+can join the game using `$fjoin`.")
             return 
 
         if self.games[lId]["IN_PROGRESS"]:
-            await ctx.send("Game already started u stupid")
+            await ctx.send("The game has already begun!")
             return
 
         self.games[lId]["IN_PROGRESS"] = True 
@@ -128,18 +132,19 @@ class Five(commands.Cog):
         c = int(c)
 
         if ctx.author.id not in g["players"]:
-            await ctx.send("why are u here go away")
+            await ctx.send("You aren't in the game.")
             return
 
         if r >= g["GRID_SIZE"] or c >= g["GRID_SIZE"] or r < 0 or c < 0:
-            await ctx.send("ur bad lol try again")
+            await ctx.send("Your input was out of range of the board. Remember, \
+the labeling is 0-4 rows, 0-4 columns.")
             return
 
         # board
         b = g["numbers"][ctx.author.id]
 
         if b[r][c] != 0:
-            await ctx.send("damn u really suck")
+            await ctx.send("This spot is already taken!")
             return
 
         b[r][c] = g["CURRENT_CARD"]
