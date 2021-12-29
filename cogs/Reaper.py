@@ -48,9 +48,12 @@ class Reaper(commands.Cog):
                     await Reaper.end(self, message, game_id)
                 else:
                     # Adds the points to the player
-                    Reaper.update(self, user_id, game_id, new_total, current_time)
+                    new_cost = round(reap_cost * 1.05)
+                    Reaper.update(self, user_id, game_id, new_total, current_time, new_cost)
                     # Logs the time of the reap, replaces the global last reap time
-                    Reaper.update(self, 0, game_id, 0, current_time)
+                    pool = int(Reaper.get_user(self, 0, game_id)[5])
+                    new_pool = pool + reap_cost
+                    Reaper.update(self, 0, game_id, 0, current_time, new_cost)
                     # Sends reponse message
                     if multi > 1:
                         # Shortens integer mulipliers to one digit long
@@ -78,13 +81,16 @@ class Reaper(commands.Cog):
         if valid and (message.content == "nextreap"):
             user_id = message.author.id
             game_id = Reaper.convert(self, message.guild.id)
-            current_time = int(time.time())
-            time_since_reap = current_time - int(Reaper.get_user(self, user_id, game_id)[2])
-            time_until_reap = 3600 - time_since_reap
-            if time_since_reap < 3600: 
-                await message.channel.send("You must wait " + str(datetime.timedelta(seconds=time_until_reap)) + " until your next reap.")
+            if Reaper.get_single_metadata(self, game_id)[5] == 0:
+                current_time = int(time.time())
+                time_since_reap = current_time - int(Reaper.get_user(self, user_id, game_id)[2])
+                time_until_reap = 3600 - time_since_reap
+                if time_since_reap < 3600: 
+                    await message.channel.send("You must wait " + str(datetime.timedelta(seconds=time_until_reap)) + " until your next reap.")
+                else:
+                    await message.channel.send("You can reap right now!")
             else:
-                await message.channel.send("You can reap right now!")
+                await message.channel.send("There is no wait period in this game!")
 
         # Leaderboard
         if valid and (message.content == "leaderboard"):
@@ -96,8 +102,12 @@ class Reaper(commands.Cog):
             string = "\n"
             for i in range(min(len(full), 10)):
                 id = int(full[i][0])
-                user = await self.client.fetch_user(id)
-                string = string + "\n" + str(user.display_name) + ": `" \
+                try:
+                    user = await self.client.fetch_user(id)
+                    name = user.display_name
+                except:
+                    name = "[user not found]"
+                string = string + "\n" + str(name) + ": `" \
                          + str(full[i][1]) + "`"
             await message.channel.send(string)
 
@@ -105,8 +115,11 @@ class Reaper(commands.Cog):
         if valid and (message.content == "cost"):
             user_id = message.author.id
             game_id = Reaper.convert(self, message.guild.id)
-            cost = str(Reaper.get_user(self, user_id, game_id)[5])
-            await message.channel.send("Your current reap cost is " + cost + " O-bucks.")
+            if Reaper.get_single_metadata(self, game_id)[5] == 1:
+                cost = str(Reaper.get_user(self, user_id, game_id)[5])
+                await message.channel.send("Your current reap cost is " + cost + " O-bucks.")
+            else:
+                await message.channel.send("Reaping in this game is free!")
 
 
     # Begins a new reaper game!
@@ -171,11 +184,9 @@ class Reaper(commands.Cog):
         return cur.fetchone()
 
     # Updates the score and last reap time for a user
-    def update(self, user_id, game_id, score, time):
+    def update(self, user_id, game_id, score, time, new_cost):
         users = Reaper.get_users(self, game_id)
         if user_id in users:
-            cost = Reaper.get_user(self, user_id, game_id)[5]
-            new_cost = round(cost * 1.05)
             cur.execute("UPDATE " + str(game_id) + \
                         " SET score=?, last_reap=?, cost=? WHERE user=?", \
                         (score, time, new_cost, user_id))

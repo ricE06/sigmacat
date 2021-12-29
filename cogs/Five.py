@@ -198,6 +198,7 @@ class Five(commands.Cog):
             await channel.send("What column do you want this card in?")
             while len(waitingx) > 0:
                 msg = await self.client.wait_for("message", check=check)
+                await channel.send("Passed.")
                 xpos = int(msg.content)
                 positions[msg.author.id][0] = xpos
                 if xpos >= -1 and xpos < GRID_SIZE:
