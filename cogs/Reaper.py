@@ -53,7 +53,7 @@ class Reaper(commands.Cog):
                     # Logs the time of the reap, replaces the global last reap time
                     pool = int(Reaper.get_user(self, 0, game_id)[5])
                     new_pool = pool + reap_cost
-                    Reaper.update(self, 0, game_id, 0, current_time, new_cost)
+                    Reaper.update(self, 0, game_id, 0, current_time, new_pool)
                     # Sends reponse message
                     if multi > 1:
                         # Shortens integer mulipliers to one digit long
@@ -121,6 +121,12 @@ class Reaper(commands.Cog):
             else:
                 await message.channel.send("Reaping in this game is free!")
 
+        # Pool
+        if valid and (message.content == "pool"):
+            game_id = Reaper.convert(self, message.guild.id)
+            pool = str(Reaper.get_user(self, 0, game_id)[5])
+            await message.channel.send("There are currently " + pool + " O-bucks up for grabs.")
+
 
     # Begins a new reaper game!
     @commands.command()
@@ -179,7 +185,7 @@ class Reaper(commands.Cog):
     def get_user(self, user_id, game_id):
         users = Reaper.get_users(self, game_id)
         if user_id not in users:
-            Reaper.update(self, user_id, game_id, 0, 0)
+            Reaper.update(self, user_id, game_id, 0, 0, 0)
         cur.execute("SELECT * FROM " + str(game_id) + " WHERE user=?", (user_id,))
         return cur.fetchone()
 
