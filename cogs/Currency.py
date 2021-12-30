@@ -35,6 +35,40 @@ class Currency(commands.Cog):
             con.commit()
             await ctx.send("Successfully deposited 1000 O-bucks!")
 
+    # untested function
+    @commands.command(name="give")
+    async def give_money(self, ctx, user: discord.Member, bal):
+        # limit tbd 
+        # how it would work:
+        # if self.check_limit(receiver, bal):
+        #     await ctx.send("You sure have a lot of fans, huh.")
+        #     return
+        # but below the statements below lol
+
+        # check_limit command:
+        # untested & more logic + safety can be used, but it's the general idea
+        # def check_limit(self, id, bal):
+        #     cur.execute("SELECT * FROM balances WHERE user=?", (user_id,))
+        #     a = cur.fetchone()[3]
+        #     if a + bal > limit:
+        #         return True 
+        #     return False
+
+        giver = ctx.author.id 
+        receiver = user.id 
+
+        if self.get_current(giver) < bal:
+            await ctx.send("If money grew on trees, you need more trees.")
+            return 
+
+        self.change(giver, -bal)
+        self.change(receiver, bal)
+
+        await ctx.send(ctx.author.name + " successfully gave " + user.name + " " + str(bal) + " o-bucks!")
+
+
+
+
     # Makes a table
     def create(self):
         cur.execute("""CREATE TABLE balances (
