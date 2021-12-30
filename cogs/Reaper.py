@@ -7,8 +7,17 @@ import random
 con = sqlite3.connect('reaper.db')
 cur = con.cursor()
 
-class Reaper(commands.Cog):
-    
+class Reaper(commands.Cog, description="Reaper is a patience game"):
+    """
+    Reap by typing `reap`. The amount of points you can get from a single reap \
+    is the exact number of seconds since the previous person reaped. The winner \
+    is the first to a set amount of points. \
+    Other commands can be found in the channel description.\n\
+    Some reaper games can be *monetized*, meaning that you must pay a certain number \
+    of O-bucks to reap in them. The O-bucks remain in a prize pool until the game \
+    *is played to completion*, when they will be distributed among the players \
+    based on their scores and a couple other additional factors (such as ranking).
+    """
     def __init__(self, client: commands.Bot):
         self.client = client
 
@@ -134,7 +143,7 @@ class Reaper(commands.Cog):
 
 
     # Begins a new reaper game!
-    @commands.command()
+    @commands.command(help="Begin a new reaper game.\nNote that only admins may begin a game.\nSyntax: `$start_game [max_points]`")
     @commands.has_permissions(administrator=True)
     async def start_game(self, ctx:commands.Context, max_points):
         game_id = "game_" + str(ctx.message.guild.id)
@@ -155,7 +164,7 @@ class Reaper(commands.Cog):
         con.commit()
 
     # End game command    
-    @commands.command()
+    @commands.command(help="Ends the current reaper game.\nNote that only admins may end a game\nSyntax: `$end_game`")
     @commands.has_permissions(administrator=True)
     async def end_game(self, ctx:commands.Context):
         game_id = Reaper.convert(self, ctx.message.guild.id)
