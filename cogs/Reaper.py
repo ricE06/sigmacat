@@ -51,14 +51,20 @@ class Reaper(commands.Cog):
                 pool = int(Reaper.get_user(self, 0, game_id)[5])
                 new_pool = pool + reap_cost
                 Reaper.update(self, 0, game_id, previous_total + points, current_time, new_pool)
+                # O-bucks earned for reaping
+                if points > 1000 and Reaper.get_single_metadata(self, game_id)[5] == 1:
+                    bonus = round((points - 1500) / 25)
+                    Currency.change(user_id, bonus)
+                else:
+                    bonus = 0
                 # Sends reponse message
+                text = "Your reap earned " + str(points) + " points."
                 if multi > 1:
                     # Shortens integer mulipliers to one digit long
                     multi = int(multi) if multi.is_integer() else multi
-                    text = "Your reap earned " + str(points)\
-                            + " points. You also got a " + str(multi) + "x reap!"
-                else:
-                    text = "Your reap earned " + str(points) + " points."
+                    text += " You also got a " + str(multi) + "x reap!"
+                if bonus > 0:
+                    text += " In addition, you earned " + str(bonus) + " O-bucks!"
                 await message.channel.send(text)
                 # Checks if this wins the game
                 if new_total >= int(Reaper.get_max_score(self, game_id)):
@@ -103,12 +109,15 @@ class Reaper(commands.Cog):
             # The thing the bot actually displays
             string = "\n"
             for i in range(len(winners)):
-                id = int(winners[i][0])
+                user_id = int(winners[i][0])
                 try:
-                    user = await self.client.fetch_user(id)
-                    name = user.display_name
+                    user = message.guild.get_member(user_id)
+                    name = user.nick
                 except:
                     name = "[user not found]"
+                if str(name) == "None":
+                    user = await self.client.fetch_user(user_id)
+                    name = user.display_name
                 string = string + "\n" + str(name) + ": `" \
                          + str(winners[i][1]) + "`"
             await message.channel.send(string)
