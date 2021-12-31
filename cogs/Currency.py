@@ -9,19 +9,22 @@ DAILY_AMOUNT = 1000
 
 
 # noinspection PyUnresolvedReferences
-class Currency(commands.Cog):
-    
+class Currency(commands.Cog, description="o-bucks"):
+    """
+    o-bucks
+    """
+
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    # Displays current balance of a user
-    @commands.command(name="balance")
-    async def show_balance(self, ctx:commands.Context):
-        user_id = ctx.message.author.id
-        await ctx.send("You currently have " + str(Currency.get_current(self, user_id)) + " O-bucks.")
+    @commands.command(name="balance", help="Displays the current balance of a user\nSyntax: `$balance` or `$balance @user`")
+    async def show_balance(self, ctx, usr: discord.Member=None):
+        if usr is None:
+            usr = ctx.author
 
-    # Adds 1000 to a user if they have not used this command within the last 24
-    @commands.command(name="daily")
+        await ctx.send(usr.name + " currently has " + str(Currency.get_current(self, usr.id)) + " O-bucks.")
+
+    @commands.command(name="daily", help="Adds 1000 to a user if they have not used this command within the last 24\nSyntax: `$daily`")
     async def give_daily(self, ctx:commands.Context):
         user_id = ctx.message.author.id
         last_daily = Currency.get_last_daily(self, user_id)
@@ -34,6 +37,40 @@ class Currency(commands.Cog):
             cur.execute("UPDATE balances SET lastDaily=? WHERE user=?", (str(current_date), user_id))
             con.commit()
             await ctx.send("Successfully deposited 1000 O-bucks!")
+
+    # untested function
+    @commands.command(name="give", help="Give some amount of money to another person\nSyntax: `$give @user amount`")
+    async def give_money(self, ctx, user: discord.Member, bal):
+        # limit tbd 
+        # how it would work:
+        # if self.check_limit(receiver, bal):
+        #     await ctx.send("You sure have a lot of fans, huh.")
+        #     return
+        # but below the statements below lol
+
+        # check_limit command:
+        # untested & more logic + safety can be used, but it's the general idea
+        # def check_limit(self, id, bal):
+        #     cur.execute("SELECT * FROM balances WHERE user=?", (user_id,))
+        #     a = cur.fetchone()[3]
+        #     if a + bal > limit:
+        #         return True 
+        #     return False
+
+        giver = ctx.author.id 
+        receiver = user.id 
+
+        if self.get_current(giver) < bal:
+            await ctx.send("If money grew on trees, you need more trees.")
+            return 
+
+        self.change(giver, -bal)
+        self.change(receiver, bal)
+
+        await ctx.send(ctx.author.name + " successfully gave " + user.name + " " + str(bal) + " o-bucks!")
+
+
+
 
     # Makes a table
     def create(self):

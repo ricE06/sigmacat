@@ -29,40 +29,75 @@ To end the game at any time, simply type `$fend`. \
 token = open("token.txt", "r").read()
 intents = discord.Intents.default()
 intents.members = True  # Subscribe to the privileged members intent.
-client = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents, help_command=None)
 
 async def load(ctx, extension):
-    client.load_extension(f"cogs.{extension}")
+    bot.load_extension(f"cogs.{extension}")
 
 async def unload(ctx, extension):
-    client.load_extension(f"cogs.{extension}")
+    bot.load_extension(f"cogs.{extension}")
 
-@client.command(name="ligma")
+@bot.command(name="ligma")
 async def ligma(ctx: commands.Context):
     await ctx.send("balls")
 
-@client.command(name="howto")
+@bot.command(name="howto")
 async def howto(ctx:commands.Context):
     await ctx.send(instructions)
 
-@client.command(name="reload")
+@bot.command(name="reload")
 async def reload(ctx:commands.Context):
     if filename.endswith(".py"):
-        client.unload_extension(f"cogs.{filename[:-3]}")
-        client.load_extension(f"cogs.{filename[:-3]}")
+        bot.unload_extension(f"cogs.{filename[:-3]}")
+        bot.load_extension(f"cogs.{filename[:-3]}")
         print(f"cogs.{filename[:-3]}")    
 
-@client.event
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print('We have logged in as {0.user}'.format(bot))
 
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
-        client.load_extension(f"cogs.{filename[:-3]}")
+        bot.load_extension(f"cogs.{filename[:-3]}")
         print(f"cogs.{filename[:-3]}")
 
-keep_alive.keep_alive()
+@bot.command()
+async def help(ctx, inp = None):
+    if not inp:
+        emb = discord.Embed(title="Help", color=discord.Color.blue(), description="A bot for [some of] your needs!")
 
-client.run(token)
+        cogs_desc = ''
+        for cog in bot.cogs:
+            cogs_desc += f'**{cog}**: {bot.cogs[cog].description}\n'
+
+        emb.add_field(name="Modules", value=cogs_desc, inline=False)
+
+        commands_desc = ''
+        for command in bot.walk_commands():
+            if not command.cog_name and not command.hidden:
+                commands_desc += f'**{command.name}**: {command.help}\n'
+
+        if commands_desc:
+            emb.add_field(name="Misc. commands", value=commands_desc, inline=False)
+    else:
+        for cog in bot.cogs:
+            if cog.lower() == inp.lower():
+                emb = discord.Embed(title=f'{cog}', description=bot.cogs[cog].__doc__, color=discord.Color.green())
+
+                for command in bot.get_cog(cog).get_commands():
+                    if not command.hidden:
+                        emb.add_field(name=command.name, value=command.help, inline=False)
+
+                break
+
+            else:
+                emb = discord.Embed(title="Error!", description=f'Could not find {inp}', color=discord.Color.red())
+
+    await ctx.send(embed=emb)
+
+
+# keep_alive.keep_alive()
+
+bot.run(token)
 
 
