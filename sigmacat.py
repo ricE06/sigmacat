@@ -27,7 +27,9 @@ To place a card, use `$fplace [row number] [column number]`. \n\
 To end the game at any time, simply type `$fend`. \
 "
 token = open("token.txt", "r").read()
-bot = commands.Bot(command_prefix = "$", help_command=None)
+intents = discord.Intents.default()
+intents.members = True  # Subscribe to the privileged members intent.
+bot = commands.Bot(command_prefix='$', intents=intents, help_command=None)
 
 async def load(ctx, extension):
     bot.load_extension(f"cogs.{extension}")
