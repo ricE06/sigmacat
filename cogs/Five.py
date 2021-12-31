@@ -2,15 +2,28 @@ import discord
 from discord.ext import commands 
 import random
 
-class Five(commands.Cog):
+class Five(commands.Cog, description="Five is a number game :D"):
+    """
+    25 cards will be drawn from 40 cards (face cards removed). Aces are \
+    worth one and all others are worth their numerical values. After each card is \
+    drawn, the player must choose an empty location on their five by five grid to \
+    place the card. Once all 25 cards have been placed, points will be calculated \
+    for each row and each column as the sum of all *sets of 2 or more adjacent* equal numbers. \
+    For example, [4, 4, 5, 7, 1] gives 8 points and [7, 9, 9, 9, 2] gives 27 points. \
+    Rows or columns without any adjacent lines give no points. \
+    The goal is to get the largest point value. \
+    The labeling for the grid is **0-4** rows, **0-4** columns. \n\
+    To place a card, use `$fplace [row number] [column number]`. \n\
+    To end the game at any time, simply type `$fend`. \
+    """
     def __init__(self, bot):
         self.bot = bot 
         self.games = {}
 
-    @commands.command()
+    @commands.command(help="Begin recruiting for a game of Five. Note that you cannot begin a new game before the previous one has either ended or $fend'ed.\nSyntax: `$five`")
     async def five(self, ctx):
         if str(ctx.channel.id) in self.games:
-            await ctx.send("There is already an active game here!")
+            await ctx.send("There is already an active game here! Type $fend if this is a mistake. ")
             return 
 
         game = {}
@@ -32,7 +45,7 @@ class Five(commands.Cog):
 
         self.games[str(ctx.channel.id)] = game
 
-    @commands.command()
+    @commands.command(help="Join a game that has begun recruitment. Note that you cannot join a game that has $fstart'ed already.\nSyntax: `$fjoin`")
     async def fjoin(self, ctx):
         lId = str(ctx.channel.id)
 
@@ -54,7 +67,7 @@ You can start another one in a different channel or wait for this one to finish.
         self.games[lId]["players"].append(ctx.author.id)
         await ctx.send("<@" + str(ctx.author.id) + "> has successfully joined!")
 
-    @commands.command()
+    @commands.command(help="Begin a game with the players that have already joined. Note that at least one player must have joined already.\nSyntax: `$fstart`")
     async def fstart(self, ctx):
         lId = str(ctx.channel.id)
 
@@ -123,7 +136,7 @@ can join the game using `$fjoin`.")
         g["CURRENT_CARD_COUNT"] += 1
         g["CURRENT_WAITING"] = g["players"].copy()
 
-    @commands.command()
+    @commands.command(help="Place the current card in a space on your board. Note that you cannot place a card into an already occupied space.\nSyntax: `$fplace [row] [column]`")
     async def fplace(self, ctx, r, c):
         lId = str(ctx.channel.id)
         g = self.games[lId]
@@ -157,14 +170,16 @@ the labeling is 0-4 rows, 0-4 columns.")
         if len(g["CURRENT_WAITING"]) < 1:
             await self.begin_player_cards(lId, ctx)
 
-    @commands.command()
+    @commands.command(help="Skips any remaining players left in the turn.\nSyntax: `$fskip`")
     async def fskip(self, ctx):
+        #todo: randomly place a card for each remaining player?
+
         lId = str(ctx.channel.id)
 
         await ctx.send("Skipping...")
         await self.begin_player_cards(lId, ctx)
 
-    @commands.command()
+    @commands.command(help="End the currently running game and calculate scores.\nSyntax: `$fend`")
     async def fend(self, ctx):
         lId = str(ctx.channel.id)
 
