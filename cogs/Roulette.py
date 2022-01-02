@@ -10,8 +10,8 @@ blacks = (15, 4, 2, 17, 6, 13, 11, 8, 10, 24, 33, 20, 31, 22, 29, 28, 35, 26)
 
 class Roulette(commands.Cog):
     """
-    Spin the roulette wheel! There are a variety of bets avaliable. Note that the
-    wheel will spin automatically after you bet.
+    Spin the roulette wheel! There are a variety of bets avaliable. 
+    Note that the wheel will spin automatically after you bet.
     """
 
     def __init__(self, client: commands.Bot):
