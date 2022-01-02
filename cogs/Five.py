@@ -23,7 +23,8 @@ class Five(commands.Cog, description="Five is a number game :D"):
     @commands.command(help="Begin recruiting for a game of Five. Note that you cannot begin a new game before the previous one has either ended or $fend'ed.\nSyntax: `$five`")
     async def five(self, ctx):
         if str(ctx.channel.id) in self.games:
-            await ctx.send("There is already an active game here! Type $fend if this is a mistake. ")
+            await ctx.send("There is already an active game here! Please wait until they are done or\
+ start one in a different channel. If they are not playing anymore, use `$fend` to end the current game.")
             return 
 
         game = {}

@@ -2,6 +2,7 @@ import sqlite3
 import discord
 from discord.ext import commands, tasks
 from datetime import date
+import math
 con = sqlite3.connect('currencies.db')
 cur = con.cursor()
 
@@ -60,14 +61,26 @@ class Currency(commands.Cog, description="o-bucks"):
         giver = ctx.author.id 
         receiver = user.id 
 
+        try:
+            bal = int(bal)
+        except:
+            await ctx.send("bro money is measured in dollars, not whatever the fuck you just gave me")
+            return
+
+        if bal < 0:
+            await ctx.send("You're an asshole.")
+            return
+
         if self.get_current(giver) < bal:
             await ctx.send("If money grew on trees, you need more trees.")
             return 
 
-        self.change(giver, -bal)
-        self.change(receiver, bal)
 
-        await ctx.send(ctx.author.name + " successfully gave " + user.name + " " + str(bal) + " o-bucks!")
+        give_amount = math.floor(bal*0.90)
+        self.change(giver, -bal)
+        self.change(receiver, give_amount)
+
+        await ctx.send(ctx.author.name + " successfully gave " + str(user.name) + " " + str(give_amount) + " o-bucks!")
 
 
 

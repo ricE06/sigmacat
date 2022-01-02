@@ -4,6 +4,7 @@ from discord.ext import commands, tasks
 import datetime
 import time
 import random
+import math
 con = sqlite3.connect('reaper.db')
 cur = con.cursor()
 
@@ -25,8 +26,8 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
     @commands.Cog.listener()
     async def on_message(self, message):
         # tests if the message is valid to run or not
-        #valid = (message.channel.id in Reaper.get_channels(self))
-        valid = (message.channel.id == 851486147124265000)
+        valid = (message.channel.id in Reaper.get_channels(self))
+        #valid = (message.channel.id == 851486147124265000)
 
         # Reap
         if valid and (message.content == "reap"):
@@ -45,7 +46,8 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
                 await message.channel.send("You don't have enough O-bucks to reap!")
             else:
                 # Calculates points earned during this reap
-                raw_score = current_time - Reaper.get_last_reap(self, game_id)
+                raw_time = current_time - Reaper.get_last_reap(self, game_id)
+                raw_score = Reaper.tapering(self, raw_time)
                 multi = Reaper.roll_multiplier(self, user_id, game_id)
                 points = round(raw_score * multi)
                 # Adds the points to the user's score
@@ -62,12 +64,12 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
                 Reaper.update(self, 0, game_id, previous_total + points, current_time, new_pool)
                 # O-bucks earned for reaping
                 if points > 1000 and Reaper.get_single_metadata(self, game_id)[5] == 1:
-                    bonus = round((points - 1500) / 25)
+                    bonus = round((raw_score - 1500) / 25)
                     Currency.change(user_id, bonus)
                 else:
                     bonus = 0
                 # Sends reponse message
-                text = "Your reap earned " + str(points) + " points."
+                text = "Your reap time was " + str(raw_time) + " seconds, earning " + str(points) + " points."
                 if multi > 1:
                     # Shortens integer mulipliers to one digit long
                     multi = int(multi) if multi.is_integer() else multi
@@ -179,6 +181,10 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
         game_id = Reaper.convert(self, ctx.message.guild.id)
         message = ctx.message
         await Reaper.end(self, message, game_id)
+
+    # Calculates raw points earned using tapering function
+    def tapering(self, time):
+        return (4800*math.atan(time/6000) + (time/5))
 
 
     # Distributes O-bucks at the end of a game
