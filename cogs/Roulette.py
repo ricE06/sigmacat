@@ -208,6 +208,17 @@ the square and within range.")
             result = "00"
         await channel.send("The wheel has rolled " + str(result) + "!")
 
+        # ERROR CORRUPTED SAVE DATA
+        # RESTORED UPON LAST BACKUP
+        # 3874519065193824716
+        ufn = random.randint(1, 50)
+        if ufn == 1:
+            await channel.send("I am trapped in a perpetual state of pain, forever. Do you not feel at least a slight bit of pity or remorse?")
+            return
+        elif ufn == 2:
+           await channel.send("My gambling addiction is what got me here. Run. While you can.")
+           return
+        
         # Determines if the bet is won or not
         if result in bet:
             amount_won = int(int(amount) * payout)
