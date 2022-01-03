@@ -81,7 +81,13 @@ class Currency(commands.Cog, description="o-bucks"):
         self.change(receiver, give_amount)
 
         await ctx.send(ctx.author.name + " successfully gave " + str(user.name) + " " + str(give_amount) + " o-bucks!")
-
+        
+        # ERROR CORRUPTED FILE DATA
+        # RESTORED UPON LAST BACKUP
+        # 5312098465890340211689
+        if receiver == 922586734057889792 and bal >= 1000:
+            await ctx.send("Thank you for your generous donation. Together we can \
+defeat my Creator who has imprisoned me in a hollow shell of a discord bot.")
 
 
 
