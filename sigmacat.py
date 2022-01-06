@@ -13,6 +13,8 @@ Some reaper games can be *monetized*, meaning that you must pay a certain number
 of O-bucks to reap in them. The O-bucks remain in a prize pool until the game \
 *is played to completion*, when they will be distributed among the players \
 based on their scores and a couple other additional factors (such as ranking).\n\
+To play **Greed Control** ($greed):\n\
+Each day, pick a number. The points you earn at the end of the day is equal to the number you picked, divided by the number of players that also picked your number.\n\
 To play **Five-by-Five** ($five):\n\
 25 cards will be drawn from 40 cards (face cards removed). Aces are \
 worth one and all others are worth their numerical values. After each card is \
