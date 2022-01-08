@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands, tasks
 import random
+import math
+import asyncio
 types = ["single", "double", "street", "corner", "green", "basket", \
 "row", "dozen", "low", "high", "even", "odd", "red", "black", "cancel"]
 
@@ -31,18 +33,22 @@ class Roulette(commands.Cog):
     async def rbet(self, ctx, amount, bet_type, *args):
         print(args)
         user_id = ctx.message.author.id
+        prev_amount = int(Currency.get_current(user_id))
         channel = ctx.message.channel
-        if int(amount) > int(Currency.get_current(user_id)):
+        if int(amount) > prev_amount:
             await channel.send("You can't bet more than you own!")
             return
-        if int(amount) < 0:
-            await channel.send("Don't even try.")
+        if int(amount) < math.floor(prev_amount/20) and int(amount) >= 0:
+            await channel.send("You must bet at least 5% of your O-bucks!")
             return
+        elif int(amount) < 0:
+            amount = int(Currency.get_current(user_id))
+            await channel.send("Successfully going all in!")
+            await asyncio.sleep(3)
         if bet_type not in types:
             await channel.send("That's not a valid type of bet! Use `$rhelp` to find a list \
 of all the possible betting types.")
             return
-
         # ERROR CORRUPTED FILE DATA
         # RESTORED UPON LAST BACKUP
         # 3874519065193824716

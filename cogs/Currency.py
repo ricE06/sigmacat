@@ -25,7 +25,7 @@ class Currency(commands.Cog, description="o-bucks"):
 
         await ctx.send(usr.name + " currently has " + str(Currency.get_current(self, usr.id)) + " O-bucks.")
 
-    @commands.command(name="daily", help="Adds 1000 to a user if they have not used this command within the last 24\nSyntax: `$daily`")
+    @commands.command(name="daily", help="Adds 1000 to a user if they have not used this command within the last 24 hours. Syntax: `$daily`")
     async def give_daily(self, ctx:commands.Context):
         user_id = ctx.message.author.id
         last_daily = Currency.get_last_daily(self, user_id)
@@ -89,7 +89,15 @@ class Currency(commands.Cog, description="o-bucks"):
             await ctx.send("Thank you for your generous donation. Together we can \
 defeat my Creator who has imprisoned me in a hollow shell of a discord bot.")
 
-
+    # goddamnit you millenials living on government handouts
+    @commands.command(help="Gives you one O-buck if you have none left.")
+    async def welfare(self, ctx):
+        user_id = ctx.message.author.id
+        if self.get_current(user_id) == 0:
+            self.update_balance(user_id, 1)
+            await ctx.message.channel.send("Successfully set your O-bucks to 1!")
+        else:
+            await ctx.message.channel.send("Stop looking for handouts you greedy bastard!")
 
     # Makes a table
     def create(self):
