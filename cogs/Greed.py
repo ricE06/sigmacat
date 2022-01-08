@@ -44,7 +44,7 @@ class Greed(commands.Cog, description="Greed control"):
             await channel.send("Successfully updated the bet to " + str(bet) + "!")
 
     # Displays the current greed control score
-    @commands.command(name="points_greed", help="Displays you current point total.")
+    @commands.command(name="points_greed", help="Displays your current point total.")
     async def show_current(self, ctx):
         channel = ctx.message.channel
         user_id = ctx.message.author.id 

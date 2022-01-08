@@ -1,7 +1,7 @@
 import sqlite3
 import discord, datetime
 from discord.ext import commands, tasks
-import datetime
+from datetime import date
 import time
 import random
 import math
@@ -43,7 +43,13 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
                 await message.channel.send("You must wait " + str(datetime.timedelta(seconds=time_until_reap)) + " until your next reap.")
             # Checks if the user has enough O-bucks to reap
             elif user_balance < reap_cost:
-                await message.channel.send("You don't have enough O-bucks to reap!")
+                string = "You don't have enough O-bucks to reap!"
+                # Checks if daily is avaliable
+                last_daily = Currency.get_last_daily(user_id)
+                current_date = str(date.today())
+                if last_daily != current_date:
+                    string += " However, you do have 1000 O-bucks avaliable by using `$daily`."
+                await message.channel.send(string)
             else:
                 # Calculates points earned during this reap
                 raw_time = current_time - Reaper.get_last_reap(self, game_id)
@@ -118,7 +124,8 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
             winners = cur.fetchmany(11)
             del winners[0]
             # The thing the bot actually displays
-            string = "\n"
+            max_score = int(Reaper.get_single_metadata(self, game_id)[2])
+            string = "Reaper leaderboard. The score required to win is: " + str(max_score)
             for i in range(len(winners)):
                 user_id = int(winners[i][0])
                 try:
@@ -195,7 +202,7 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
         max_score = int(Reaper.get_single_metadata(self, game_id)[2])
         del winners[0]
         if Reaper.get_single_metadata(self, game_id)[5] == 1 and \
-        max_score >= 50000 and len(winners) == 10:
+        max_score >= 25000 and len(winners) == 10:
             pool = Reaper.get_user(self, 0, game_id)[5]
             total_score = Reaper.get_user(self, 0, game_id)[1]
             string = "O-bucks awarded: "
