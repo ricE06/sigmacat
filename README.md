@@ -23,9 +23,11 @@ For more details on any of the games mentioned, check their individual sections 
 # Features:
 ## Currency system
 Currency is measured in O-bucks.
+
+Commands:
  - **$balance** to check your balance
  - **$daily** to collect 1000 O-bucks once a day
- - **$give** to give another player O-bucks. Note that there is a 10% tax when doing so.
+ - **$give (ping user here) (amount to give)** to give another player O-bucks. Note that there is a 10% tax when doing so. You can give O-bucks to sigmacat itself, but you won't get it back again, unless...?
  - **$welfare** to get 1 O-buck if you're completely out.
 
 ## Reaper
@@ -40,7 +42,9 @@ For now, all reaper games are *monetized*, meaning that O-bucks are involved. Sp
  - It costs 100 O-bucks to reap and that number increases by 5% every time you reap
  - You earn O-bucks for reaping using the formula (points-1500)/25
  - All spent O-bucks are placed in a prize pool to be distributed once someone wins
- - Distribution is as follows:
+ - Distribution is as follows: k \* (prize pool) * (your score) / (sum of everyone's scores)
+ - k is equal to 1.5 for top 3, 1.2 for #4 and #5, 1 for 6-10, and 0 for everyone else.
+ - In addition, 1st place can receive *overkill* rewards, where they gain 1 O-buck for every 5 points they earn past the minimum score required to win.
 
 ### ADMIN ONLY COMMANDS
  - **$start_game (max_points)** begins a new reaper game. *Make sure you do this in a designated channel for reaper.* max_points is recommended to be between 50k and 200k for balance reasons and must be above 25k to qualify for O-buck rewards. Your reaper game is now tied to this channel, and keyword commands will only work in this channel.
@@ -54,4 +58,56 @@ For now, all reaper games are *monetized*, meaning that O-bucks are involved. Sp
  - **nextreap** displays the time required until you can reap again, if the game is not monetized.
  - **cost** displays the current reap cost (how much you have to pay to reap). 
  - **pool** displays the *sum of all O-bucks spent by purely reaping*. It does *not* show the total amount of O-bucks to be distributed at the end of the game, that number is related but different. See the distribution calculation methods for more info on this.
- - 
+
+## Greed Control
+A simple game about, as the name implies, controlling the natural human instinct to obtain as much of a resource as possible. 
+ - Each day, you can select a number from 1 to a certian limit (for now 1 to 5).
+ - Each day at midnight, points are distributed equal to the number you chose *divided by* the total number of people who *also* chose your number.
+ - First to a set number of points wins. (Points are rounded to 4 decimal places.)
+
+Note that Greed Control has not been integrated with the currency system yet.
+
+ - **$greed** lets you pick a number for the day. *Keep your number secret*. After you use the command, the bot will DM you and you have fifteen seconds to respond with a number. If you use this command multiple times in a day, you will merely update your pick instead of picking multiple times. 
+ - **$greederboard** displays the global greed leaderboard, including the top 10 usernames and scores.
+
+## Roulette
+Spin the roulette wheel! Note that unlike actual roulette, you can only bet on one thing per spin, and you cannot play a game with multiple people for now. The wheel will spin automatically after you bet. The numbers on the wheel include 1-36, 0, and 00. 
+
+There are a variety of bets avaliable:
+
+Bets that pay more than you bet:
+ - **single**: self explantory. Bet on the wheel spinning the exact number you picked. If you win, you earn 35x your bet. Specifiers: the number you are betting on
+ - **double**: Bet on the wheel spinning one of two adjacent numbers on the roulette table. If you win, you earn 17x your bet. Specifiers: the two numbers you are betting on
+ - **street**: Bet on the wheel spinning one of three numbers in a column. If you win, you earn 11x your bet. Specifiers: the bottom number of the column
+ - **corner**: Bet on the wheel spinning one of four numbers in a square. If you win, you earn 8x your bet. Specifiers: the bottom left number of the square
+ - **green**: Bet on the wheel spinning either 0 or 00. If you win, you earn 17x your bet. Specifiers: none
+ - **basket**: Bet on the wheel spinning one of 0, 00, 1, 2, or 3. If you win, you earn 6x your bet. Specifiers: none
+ - **row**: Bet on the wheel spinning one of twelve numbers in a row. If you win, you earn 2x your bet. Specifiers: the row number
+ - **dozen**: Bet on the wheel spinning one of twelve numbers in a block. If you win, you earn 2x your bet. Specifiers: the group number
+
+Bets that pay out exactly how much you bet (no specifiers):
+ - **low** or **high**: Bet on the wheel spinning either between 01 and 18 or between 19 and 36, respectively.
+ - **even** or **odd**: Bet on the result being either even or odd, respectively.
+ - **red** or **black**: Bet on the wheel spinning a red number or a black number, respectively.
+
+Red numbers include: 32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3
+
+Black numbers include: 15, 4, 2, 17, 6, 13, 11, 8, 10, 24, 33, 20, 31, 22, 29, 28, 35, 26
+
+Commands:
+ - **$rbet (bet amount) (bet type) (specifiers if required)** lets you spin the roulette wheel. If you try to bet a negative number, something interesting happens...
+ - **$rtable** displays the roulette table.
+ - **$rhelp** shows the types of bets without having to come back here all the time.
+
+## Five by Five
+Singleplayer or multiplayer card game. 25 cards are drawn from a total of 40, one at a time. Face cards are removed, and aces are worth 1. Each time a card is drawn, each player picks a place on a 5x5 grid to place it. Once all cards have been placed, score is calculated as follows:
+ - Each row *and* each column is calculated seperately, then summed up.
+ - Whenever there are two or more numbers of the same value next to each other in the same row or column, they get points. For example, [7, 9, 9, 9, 5] gives 27 points and [6, 4, 4, 9, 1] gives 8 points, but [5, 6, 1, 3, 1] gives no points.
+
+Commands:
+ - **$five** activates and begins *recruiting* for a game. This means that until the game has been started, anyone can join the room and play the game once it starts. You can't play multiple games of five-by-five in the same channel, so kindly wait for the current game to finish if it is still active.
+ - **$fjoin** allows you to join a game that has been activated but not started.
+ - **$fstart** begins the game, as long as there is at least one player in the waiting room.
+ - **$fplace (row number) (column number)** places your current card into the position that you want it to be, as long as it is vacant (denoted with a 0). Note that the row and column labeling systems are **zero-indexed** (i.e. they go from 0-4 instead of 1-5), left to right and top to bottom.
+ - **$fskip** skips any players who haven't placed their cards if they are taking too long.
+ - **$fend** ends the current game in that channel. Note that you dont have to be in the game to end it - in case the previous players have just left it there. However, be courteous and don't end a game that is obviously in progress.
