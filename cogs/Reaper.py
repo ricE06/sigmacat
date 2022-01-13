@@ -202,7 +202,7 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
         max_score = int(Reaper.get_single_metadata(self, game_id)[2])
         del winners[0]
         if Reaper.get_single_metadata(self, game_id)[5] == 1 and \
-        max_score >= 25000 and len(winners) == 10:
+        max_score >= 25000 and len(winners) >= 5:
             pool = Reaper.get_user(self, 0, game_id)[5]
             total_score = Reaper.get_user(self, 0, game_id)[1]
             string = "O-bucks awarded: "

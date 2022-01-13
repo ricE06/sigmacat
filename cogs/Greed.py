@@ -51,6 +51,24 @@ class Greed(commands.Cog, description="Greed control"):
         points = self.get_user(user_id)[1]
         await channel.send("You currently have " + str(points) + " points in Greed Control.")
 
+    # Displays a top 10 leaderboard in greed control
+    @commands.command(name="greederboard", help="Displays the top 10 point scores in greed control.")
+    async def leaderboard(self, ctx):
+        channel = ctx.message.channel
+        cur.execute("SELECT user, score FROM scores ORDER BY score DESC")
+        winners = cur.fetchmany(11)
+        del winners[0]
+        max_score = float(self.get_user(0)[1])
+        string = "Greed control leaderboard. The score required to win is: " + str(max_score)
+        for i in range(len(winners)):
+            user_id = int(winners[i][0])
+            user = await self.client.fetch_user(user_id)
+            name = user.display_name
+            string = string + "\n" + str(name) + ": `" \
+                     + str(winners[i][1]) + "`"
+        await channel.send(string)
+
+
 
     # Scuffed function to get a function to run at midnight each day
     @commands.command()
@@ -68,6 +86,7 @@ class Greed(commands.Cog, description="Greed control"):
             print(wait)
             await asyncio.sleep(wait)
             await self.give_points()
+            await asyncio.sleep(30)
             
 
     # Distributes points every 24 hours
@@ -110,7 +129,7 @@ class Greed(commands.Cog, description="Greed control"):
         for user in scores:
             user_id = user[0]
             earned = points[user[2]-1]
-            new_score = user[1] + earned
+            new_score = round(user[1] + earned, 4)
             if new_score >= max_score:
                 winners.append(user_id)
             cur.execute("UPDATE scores SET score=?, bet=? WHERE user=?", (new_score, 0, user_id))
