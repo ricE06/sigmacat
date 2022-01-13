@@ -132,9 +132,9 @@ Commands:
 
 ## Changelog
 
-For more details on any of the games mentioned, check their individual sections further in this document.
+For more details on any of the games mentioned, check their individual sections in this document.
 
-### Most recent (1.2): Greed Control
+### 1.2: Greed Control
 
  - Play a global game of greed control
  - Join O Gang discord server to see the distribution statistics for numbers selected, and to follow the announcements channel there to get those statistics in your own server
