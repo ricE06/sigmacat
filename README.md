@@ -1,30 +1,27 @@
-# sigmacat v1.2.2
+# sigmacat v1.3.0
 
 This documentation serves as an in-depth record of all the components of the sigmacat bot. It's long and technical, so perhaps just using the **$help** command is enough information for you. If not, you can keep reading.
 
 Contact me on discord if you have questions or want to contribute at
 ricez cakes#8192
 
-# Changelog
-For more details on any of the games mentioned, check their individual sections further in this document.
-### Upcoming (1.3): Blackjack
-### Most recent (1.2): Greed Control
- - Play a global game of greed control
- - Join O Gang discord server to see the distribution statistics for numbers selected, and to follow the announcements channel there to get those statistics in your own server
- - Play from any server that has sigmacat with **$greed**.
-### 1.1: Roulette
- - Bet in a variety of ways with **$rbet**. The roulette wheel will automatically spin by using the command.
- - Reaper games can now be played in any server you like.
-### 1.0: REAPER IS NOW UP!
- - Limited to O Gang discord server for now
- - Integrated with currency system
- - Reap with **reap** in the reaper channel
+Join O Gang server https://discord.gg/wdFz7As9Er to get exclusive beta games, give suggestions and bug reports, and be notified about sigmacat updates.
 
-# Features:
+### (Most recent update) 1.3.0: Blackjack!
+
+- Play a game of blackjack with **$blackjack**!
+- Added leaderboard for greed control
+- Monetization for reaper only requires 5 active players
+- Roulette minimum reverted to 1 instead of 5% of your net worth
+- little more housekeeping
+
+The full changelog can be found at the bottom of the documentation.
+
 ## Currency system
 Currency is measured in O-bucks.
 
 Commands:
+
  - **$balance** to check your balance
  - **$daily** to collect 1000 O-bucks once a day
  - **$give (ping user here) (amount to give)** to give another player O-bucks. Note that there is a 10% tax when doing so. You can give O-bucks to sigmacat itself, but you won't get it back again, unless...?
@@ -67,13 +64,15 @@ A simple game about, as the name implies, controlling the natural human instinct
 
 Note that Greed Control has not been integrated with the currency system yet.
 
+Commands:
+
  - **$greed** lets you pick a number for the day. *Keep your number secret*. After you use the command, the bot will DM you and you have fifteen seconds to respond with a number. If you use this command multiple times in a day, you will merely update your pick instead of picking multiple times. 
  - **$greederboard** displays the global greed leaderboard, including the top 10 usernames and scores.
 
 ## Roulette
 Spin the roulette wheel! Note that unlike actual roulette, you can only bet on one thing per spin, and you cannot play a game with multiple people for now. The wheel will spin automatically after you bet. The numbers on the wheel include 1-36, 0, and 00. 
 
-There are a variety of bets avaliable:
+There are a variety of bets available:
 
 Bets that pay more than you bet:
  - **single**: self explantory. Bet on the wheel spinning the exact number you picked. If you win, you earn 35x your bet. Specifiers: the number you are betting on
@@ -95,6 +94,7 @@ Red numbers include: 32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7,
 Black numbers include: 15, 4, 2, 17, 6, 13, 11, 8, 10, 24, 33, 20, 31, 22, 29, 28, 35, 26
 
 Commands:
+
  - **$rbet (bet amount) (bet type) (specifiers if required)** lets you spin the roulette wheel. If you try to bet a negative number, something interesting happens...
  - **$rtable** displays the roulette table.
  - **$rhelp** shows the types of bets without having to come back here all the time.
@@ -111,3 +111,43 @@ Commands:
  - **$fplace (row number) (column number)** places your current card into the position that you want it to be, as long as it is vacant (denoted with a 0). Note that the row and column labeling systems are **zero-indexed** (i.e. they go from 0-4 instead of 1-5), left to right and top to bottom.
  - **$fskip** skips any players who haven't placed their cards if they are taking too long.
  - **$fend** ends the current game in that channel. Note that you dont have to be in the game to end it - in case the previous players have just left it there. However, be courteous and don't end a game that is obviously in progress.
+
+## Blackjack
+
+Minimalistic single-player blackjack game. Two cards are dealt to the player and to the dealer, and one of the dealer's card is covered up (denoted with an "X"). Face cards are worth 10, aces are worth either 1 or 11, and all other cards their numerical values. 
+
+If the player's cards automatically sum to 21, they have a "natural" and earn 1.5x their bet. If the dealer's cards sum to 21, the player automatically loses. If both do, it's a standoff and no one gets anything.
+
+During the player's turn, the player can repeatedly "hit" (get a new card) and then decide to "stand" (end their turn). They have 15 seconds to make this choice. If at any point their sum goes above 22 (both sums if an ace is in their hand), they "bust" and automatically lose.
+
+Then, the dealer's turn begins. The dealer must hit until they have at least a sum of 17, at which point they must stand. Similarly, if a dealer busts, the player automatically wins.
+
+If no one has busted, the player with the higher sum wins. If they have equal sums, it is a standoff and the player doesn't earn or lose any money.
+
+Note that card counting will never work because cards are chosen truly randomly, instead of a card pool to draw from.
+
+Commands:
+
+- **$blackjack (bet_amount)** begins a round of Blackjack.
+
+## Changelog
+
+For more details on any of the games mentioned, check their individual sections further in this document.
+
+### Most recent (1.2): Greed Control
+
+ - Play a global game of greed control
+ - Join O Gang discord server to see the distribution statistics for numbers selected, and to follow the announcements channel there to get those statistics in your own server
+ - Play from any server that has sigmacat with **$greed**.
+
+### 1.1: Roulette
+
+ - Bet in a variety of ways with **$rbet**. The roulette wheel will automatically spin by using the command.
+ - Reaper games can now be played in any server you like.
+
+### 1.0: REAPER IS NOW UP!
+
+ - Limited to O Gang discord server for now
+ - Integrated with currency system
+ - Reap with **reap** in the reaper channel
+
