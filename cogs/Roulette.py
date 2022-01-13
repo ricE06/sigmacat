@@ -31,15 +31,14 @@ class Roulette(commands.Cog):
 
     @commands.command(name="rbet", help="Spins the roulette wheel!\n Syntax: `$rbet bet_amount bet_type (any other specifiers)`")
     async def rbet(self, ctx, amount, bet_type, *args):
-        print(args)
         user_id = ctx.message.author.id
         prev_amount = int(Currency.get_current(user_id))
         channel = ctx.message.channel
         if int(amount) > prev_amount:
             await channel.send("You can't bet more than you own!")
             return
-        if int(amount) < math.floor(prev_amount/20) and int(amount) >= 0:
-            await channel.send("You must bet at least 5% of your O-bucks!")
+        if int(amount) == 0:
+            await channel.send("You must bet *something*.")
             return
         elif int(amount) < 0:
             amount = int(Currency.get_current(user_id))

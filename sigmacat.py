@@ -58,8 +58,9 @@ async def reload(ctx:commands.Context):
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
 
+bot.load_extension("cogs.Currency")
 for filename in os.listdir("./cogs"):
-    if filename.endswith(".py"):
+    if filename.endswith(".py") and "Currency" not in filename:
         bot.load_extension(f"cogs.{filename[:-3]}")
         print(f"cogs.{filename[:-3]}")
 
