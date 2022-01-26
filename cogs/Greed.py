@@ -19,6 +19,10 @@ class Greed(commands.Cog, description="Greed control"):
     @commands.command(help="Place your bets! Syntax: `$greed (number)`")
     async def greed(self, ctx):
         user_id = ctx.message.author.id
+        if self.Jail.check_jail(user_id) == True:
+            await ctx.send("You can't play greed control in jail!")
+            return
+        
         max_bet = Greed.get_user(self, 0)[2]
         await ctx.author.send("Pick a number between 1 and " + str(max_bet) + ".")
         channel = ctx.author.dm_channel
@@ -70,7 +74,7 @@ class Greed(commands.Cog, description="Greed control"):
 
 
 
-    # Scuffed function to get a function to run at midnight each day
+    # Scuffed function to get a function to run at midnight each day, obsolete
     @commands.command()
     async def timer(self, ctx):
         if ctx.message.author.id != 732415222706339840:
@@ -128,11 +132,12 @@ class Greed(commands.Cog, description="Greed control"):
         winners = []
         for user in scores:
             user_id = user[0]
-            earned = points[user[2]-1]
-            new_score = round(user[1] + earned, 4)
-            if new_score >= max_score:
-                winners.append(user_id)
-            cur.execute("UPDATE scores SET score=?, bet=? WHERE user=?", (new_score, 0, user_id))
+            if user[2] > 0:
+                earned = points[user[2]-1]
+                new_score = round(user[1] + earned, 4)
+                if new_score >= max_score:
+                    winners.append(user_id)
+                cur.execute("UPDATE scores SET score=?, bet=? WHERE user=?", (new_score, 0, user_id))
 
         if len(winners) >= 1:
             if len(winners) == 1:

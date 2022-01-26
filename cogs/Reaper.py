@@ -21,12 +21,13 @@ class Reaper(commands.Cog, description="Reaper is a patience game"):
     """
     def __init__(self, client: commands.Bot):
         self.client = client
+        self.Jail = self.client.get_cog("Jail")
 
     # MAIN REAPER COMMANDS
     @commands.Cog.listener()
     async def on_message(self, message):
         # tests if the message is valid to run or not
-        valid = (message.channel.id in Reaper.get_channels(self))
+        valid = (message.channel.id in Reaper.get_channels(self)) and (self.Jail.check_jail(user_id) == False)
         #valid = (message.channel.id == 851486147124265000)
 
         # Reap
