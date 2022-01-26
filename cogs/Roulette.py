@@ -18,7 +18,8 @@ class Roulette(commands.Cog):
 
     def __init__(self, client: commands.Bot):
         self.client = client
-
+        self.Jail = self.client.get_cog("Jail")
+    
     @commands.command(name="rtable", help="Displays the roulette table.")
     async def display(self, ctx):
         string = """```
@@ -32,6 +33,10 @@ class Roulette(commands.Cog):
     @commands.command(name="rbet", help="Spins the roulette wheel!\n Syntax: `$rbet bet_amount bet_type (any other specifiers)`")
     async def rbet(self, ctx, amount, bet_type, *args):
         user_id = ctx.message.author.id
+        if self.Jail.check_jail(user_id) == True:
+            await ctx.send("You can't gamble in jail!")
+            return
+
         prev_amount = int(Currency.get_current(user_id))
         channel = ctx.message.channel
         if int(amount) > prev_amount:

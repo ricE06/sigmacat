@@ -12,6 +12,7 @@ class Blackjack(commands.Cog, description="Classic game of blackjack."):
 	def __init__(self, client: commands.Bot):
 		self.client = client
 		self.Currency = self.client.get_cog("Currency")
+		self.Jail = self.client.get_cog("Jail")
 
 	# Gives a card to the hand (either player of dealer)
 	# Aces are denoted by 1
@@ -77,9 +78,12 @@ class Blackjack(commands.Cog, description="Classic game of blackjack."):
 	async def blackjack(self, ctx, amount):
 		channel = ctx.message.channel
 		user_id = ctx.message.author.id
-		prev_amount = int(self.Currency.get_current(user_id))
-		
+		if self.Jail.check_jail(user_id) == True:
+			await ctx.send("You can't gamble in jail!")
+			return
 
+
+		prev_amount = int(self.Currency.get_current(user_id))		
 		# Makes sure bet is valid
 		if int(amount) > prev_amount:
 			await channel.send("You can't bet more than you own!")

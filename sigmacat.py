@@ -3,6 +3,8 @@ from discord.ext import commands
 import random
 import os
 import keep_alive
+import asyncio
+import time
 
 instructions = "To play **Reaper** (\"reap\"):\n\
 Reap by typing `reap`. The amount of points you can get from a single reap \
@@ -58,9 +60,12 @@ async def reload(ctx:commands.Context):
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
 
-bot.load_extension("cogs.Currency")
+required_in_order = ("Jail", "Currency")
+
+for cog in required_in_order:
+    bot.load_extension("cogs." + cog)
 for filename in os.listdir("./cogs"):
-    if filename.endswith(".py") and "Currency" not in filename:
+    if filename.endswith(".py") and filename[:-3] not in required_in_order:
         bot.load_extension(f"cogs.{filename[:-3]}")
         print(f"cogs.{filename[:-3]}")
 
@@ -101,6 +106,29 @@ async def help(ctx, inp = None):
 
 # keep_alive.keep_alive()
 
+# things that need to run every 24 hours
+Currency = bot.get_cog("Currency")
+Greed = bot.get_cog("Greed")
+async def lol():
+    current = time.ctime()
+    s = int(current[17:19])
+    m = int(current[14:16])
+    h = int(current[11:13])
+    wait = (23-h)*3600+(59-m)*60+s
+    print(wait)
+    if wait < 1:
+       wait = 24*60*60
+    print(wait)
+    await asyncio.sleep(wait)
+    await Currency.bank_update()
+    await Greed.give_points()
+    await asyncio.sleep(30)
+
+bot.loop.create_task(lol())
 bot.run(token)
+print("yay")
+
+
+
 
 
